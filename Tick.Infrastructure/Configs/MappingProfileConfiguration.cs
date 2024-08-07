@@ -14,6 +14,9 @@ namespace Tick.Infrastructure.Configs
             CreateMap<BasicUser, BasicAuthResponse>(MemberList.None);
             CreateMap<AddUserRequest, Ticker>(MemberList.None)
                 .ForMember(dest => dest.DefaultRole, opt => opt.MapFrom(src => src.Role));
+            CreateMap<Task, TaskResponse>(MemberList.None);
+            CreateMap<AddTaskRequest, Task>(MemberList.None);
+            CreateMap<EditTaskRequest, Task>(MemberList.None);
         }
     }
 }

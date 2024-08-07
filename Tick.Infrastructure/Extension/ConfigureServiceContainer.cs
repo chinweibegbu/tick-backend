@@ -59,6 +59,7 @@ namespace Tick.Infrastructure.Extension
             serviceCollection.AddTransient<IAPIImplementation, APIImplementation>();
             serviceCollection.AddTransient<IClientFactory, ClientFactory>();
             serviceCollection.AddTransient<IUserService, UserService>();
+            serviceCollection.AddTransient<ITaskService, TaskService>();
             serviceCollection.AddTransient<IAppSessionService, AppSessionService>();
             serviceCollection.AddTransient<INotificationService, NotificationService>();
         }
@@ -78,6 +79,7 @@ namespace Tick.Infrastructure.Extension
         {
             serviceCollection.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             serviceCollection.AddSingleton<IBasicUserRepository, BasicUserRepository>();
+            serviceCollection.AddSingleton<ITaskRepository, TaskRepository>();
         }
 
         public static void AddJwtIdentityService(this IServiceCollection services, IConfiguration configuration)

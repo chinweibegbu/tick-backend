@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System;
+using System.ComponentModel.DataAnnotations.Schema;
+using Tick.Domain.Common;
 using Tick.Domain.Entities.Base;
 
 namespace Tick.Domain.Entities
@@ -23,5 +25,10 @@ namespace Tick.Domain.Entities
         public string TickerId {  get; set; }
 
         public Ticker Ticker { get; set; }
+
+        public override void SetNewId()
+        {
+            Id = $"AUD_{CoreHelpers.CreateUlid(DateTimeOffset.Now)}";
+        }
     }
 }
