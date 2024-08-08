@@ -6,7 +6,7 @@ namespace Tick.Core.DTO.Request
     {
         [DataType(DataType.Text)]
         [Required]
-        public string Username { get; set; }
+        public string Email { get; set; }
         [DataType(DataType.Text)]
         [Required]
         public string Password { get; set; }

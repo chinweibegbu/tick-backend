@@ -72,14 +72,14 @@ namespace Tick.Core.Implementation
 
         public async Task<Response<AuthenticationResponse>> AuthenticateAsync(AuthenticationRequest request, CancellationToken cancellationToken)
         {
-            // Check for the username
+            // Check for the email
             Ticker user = await _userManager.Users
-                .Where(x => x.NormalizedUserName == request.Username.ToUpper())
+                .Where(x => x.NormalizedEmail == request.Email.ToUpper())
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (user == null)
             {
-                throw new ApiException($"No Accounts Registered with {request.Username}.");
+                throw new ApiException($"No Accounts Registered with {request.Email}.");
             }
 
             if (!user.IsActive)
@@ -95,7 +95,7 @@ namespace Tick.Core.Implementation
                 {
                     throw new ApiException($"This user has been locked. Kindly contact the administrator.");
                 }
-                throw new ApiException($"Invalid Credentials for '{request.Username}'.");
+                throw new ApiException($"Invalid Credentials for '{request.Email}'.");
             }
             JwtSecurityToken jwtSecurityToken = await GenerateJWToken(user, cancellationToken);
 
@@ -109,7 +109,7 @@ namespace Tick.Core.Implementation
             user.LastLoginTime = DateTime.Now;
             await _userManager.UpdateAsync(user);
 
-            return new Response<AuthenticationResponse>(response, $"Authenticated {user.UserName}");
+            return new Response<AuthenticationResponse>(response, $"Authenticated {user.Email}");
         }
 
         public async Task<BasicAuthResponse> BasicAuthenticateAsync(string apiKey, CancellationToken cancellationToken)
