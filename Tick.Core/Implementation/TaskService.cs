@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Org.BouncyCastle.Asn1.Ocsp;
 
 namespace Tick.Core.Implementation
 {
@@ -46,8 +47,12 @@ namespace Tick.Core.Implementation
             return new PagedResponse<List<TaskResponse>>(taskResponses, pagedTasks.PageMeta.PageNumber, pagedTasks.PageMeta.PageSize, pagedTasks.PageMeta.TotalRecords, "Tasks Retrieved Successfully");
         }
 
-        public async Task<List<TaskResponse>> GetTasksByUserIdAsync(string tickerId, CancellationToken cancellationToken)
+        public async Task<List<TaskResponse>> GetTasksByUserIdAsync(CancellationToken cancellationToken)
         {
+            // Get user from HTTPContextAccessor
+            string tickerId = _httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(x => x.Type == "userId")?.Value;
+
+            // Get tasks by user
             var tasks = await _taskRepository.GetTasksByUserIdAsync(tickerId);
 
             // Map the list of tasks to a list of TaskResponse objects using the injected IMapper
@@ -58,29 +63,42 @@ namespace Tick.Core.Implementation
 
         public async Task<Response<TaskResponse>> GetTaskById(string taskId, CancellationToken cancellationToken)
         {
-            var task = await _taskRepository.GetTaskByIdAsync(taskId);
+            // Confirm that a user is logged in
+            string tickerId = _httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(x => x.Type == "userId")?.Value;
 
-            // Handle the case where the task is not found
-            if (task == null)
+            if (string.IsNullOrEmpty(tickerId))
             {
-                return null;
+                throw new ApiException("Please Login.");
+            }
+
+            // Retrieve the existing task by ID
+            var existingTask = await _taskRepository.GetTaskByIdAsync(taskId);
+            if (existingTask == null)
+            {
+                throw new ApiException($"Task with ID {taskId} not found");
+            }
+
+            // Ensure the exsiting task belongs to the current user
+            if (existingTask.TickerId != tickerId)
+            {
+                throw new UnauthorizedAccessException("You do not have permission to update this task.");
             }
 
             // Map the retrieved task to a TaskResponse object using the injected IMapper
-            var response = _mapper.Map<TaskResponse>(task);
+            var response = _mapper.Map<TaskResponse>(existingTask);
             return new Response<TaskResponse>(response);
         }
 
         public async Task<Response<TaskResponse>> AddTaskAsync(AddTaskRequest taskRequest, CancellationToken cancellationToken)
         {
-            string userId = _httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(x => x.Type == "userId")?.Value;
+            string tickerId = _httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(x => x.Type == "userId")?.Value;
 
             var taskEntity = _mapper.Map<Tick.Domain.Entities.Task>(taskRequest);
-            taskEntity.TickerId = userId;
+            taskEntity.TickerId = tickerId;
             taskEntity.IsCompleted = false;
             taskEntity.CreatedAt = DateTime.Now;
 
-            // Call repository method to add task
+            // Add created task to DB using repository call
             var addedTask = await _taskRepository.AddTaskAsync(taskEntity);
 
             var response = _mapper.Map<TaskResponse>(addedTask);
@@ -90,9 +108,9 @@ namespace Tick.Core.Implementation
         public async Task<Response<TaskResponse>> EditTaskAsync(EditTaskRequest taskRequest, string taskId, CancellationToken cancellationToken)
         {
             // Confirm that a user is logged in
-            string userId = _httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(x => x.Type == "userId")?.Value;
+            string tickerId = _httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(x => x.Type == "userId")?.Value;
 
-            if (string.IsNullOrEmpty(userId))
+            if (string.IsNullOrEmpty(tickerId))
             {
                 throw new ApiException("Please Login.");
             }
@@ -104,14 +122,17 @@ namespace Tick.Core.Implementation
                 throw new ApiException($"Task with ID {taskId} not found");
             }
 
-            // Ensure the task belongs to the current user
-            if (existingTask.TickerId != userId)
+            // Ensure the exsiting task belongs to the current user
+            if (existingTask.TickerId != tickerId)
             {
                 throw new UnauthorizedAccessException("You do not have permission to update this task.");
             }
-            // Map the incoming update request onto the existing TASK entity
-            _mapper.Map(taskRequest, existingTask);
 
+            // Update task for specified fields
+            existingTask.Details = string.IsNullOrEmpty(taskRequest.Details) ? existingTask.Details : taskRequest.Details;
+            existingTask.IsImportant = (taskRequest.IsImportant == null) ? existingTask.IsImportant : taskRequest.IsImportant.Value;
+
+            // Update existing task in DB with repository call
             var updatedTask = await _taskRepository.EditTaskAsync(existingTask);
 
             var response = _mapper.Map<TaskResponse>(updatedTask);
@@ -121,9 +142,42 @@ namespace Tick.Core.Implementation
         public async Task<Response<TaskResponse>> ToggleCompleteTaskAsync(string taskId, CancellationToken cancellationToken)
         {
             // Confirm that a user is logged in
-            string userId = _httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(x => x.Type == "userId")?.Value;
+            string tickerId = _httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(x => x.Type == "userId")?.Value;
 
-            if (string.IsNullOrEmpty(userId))
+            if (string.IsNullOrEmpty(tickerId))
+            {
+                throw new ApiException("Please Login.");
+            }
+
+            // Retrieve the existing task by ID
+            var existingTask = await _taskRepository.GetTaskByIdAsync(taskId);
+            if (existingTask == null)
+            {
+                throw new ApiException($"Task with ID {taskId} not found");
+            }
+
+            // Ensure the existing task belongs to the current user
+            if (existingTask.TickerId != tickerId)
+            {
+                throw new UnauthorizedAccessException("You do not have permission to update this task.");
+            }
+
+            // Toggle complete property of existing task
+            existingTask.IsCompleted = !existingTask.IsCompleted;
+
+            // Update existing task in DB with repository call
+            var updatedTask = await _taskRepository.EditTaskAsync(existingTask);
+
+            var response = _mapper.Map<TaskResponse>(existingTask);
+            return new Response<TaskResponse>(response, message: "Task Updated Successfully");
+        }
+
+        public async Task<Response<string>> DeleteTaskAsync(string taskId, CancellationToken cancellationToken)
+        {
+            // Confirm that a user is logged in
+            string tickerId = _httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(x => x.Type == "userId")?.Value;
+
+            if (string.IsNullOrEmpty(tickerId))
             {
                 throw new ApiException("Please Login.");
             }
@@ -136,36 +190,15 @@ namespace Tick.Core.Implementation
             }
 
             // Ensure the task belongs to the current user
-            if (existingTask.TickerId != userId)
+            if (existingTask.TickerId != tickerId)
             {
                 throw new UnauthorizedAccessException("You do not have permission to update this task.");
             }
 
-            var updatedTask = await _taskRepository.ToggleCompleteTaskAsync(existingTask);
+            // Delete existing task from DB with repository call
+            await _taskRepository.DeleteTaskAsync(existingTask);
 
-            var response = _mapper.Map<TaskResponse>(updatedTask);
-            return new Response<TaskResponse>(response, message: "Task Updated Successfully");
-        }
-
-        public async Task<Response<string>> DeleteTaskAsync(string taskId, CancellationToken cancellationToken)
-        {
-            // Confirm that a user is logged in
-            string userId = _httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(x => x.Type == "userId")?.Value;
-
-            if (string.IsNullOrEmpty(userId))
-            {
-                throw new ApiException("Please Login.");
-            }
-            
-            // Delete Task
-            try
-            {
-                var result = await _taskRepository.DeleteTaskAsync(taskId);
-            } catch (Exception ex) {
-                throw new ApiException(ex.Message);
-            }
-
-            return new Response<string>(taskId, message: $"Successfully deleted the Task.");
+            return new Response<string>("Task Deleted Successfully");;
         }
     }
 }

@@ -16,6 +16,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 using System.Threading;
+using Tick.Core.Exceptions;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Tick.Core.Repository
 {
@@ -100,23 +102,26 @@ namespace Tick.Core.Repository
             {
                 var dbContext = GetDatabaseContext(scope);
 
+                // Check that task is valid
+                if (task == null)
+                {
+                    // Handle the case where task is null
+                    throw new ApiException("Task object cannot be null");
+                }
+
+
+                // Add valid task to DB
                 try
                 {
-                    if (task == null)
-                    {
-                        // Handle the case where task is null
-                        throw new ArgumentNullException(nameof(task), "Task object cannot be null");
-                    }
-
                     await _getDbSet(dbContext).AddAsync(task);
                     await dbContext.SaveChangesAsync();
 
                     return task;
                 }
-                catch (DbUpdateException ex)
+                catch (Exception ex)
                 {
                     // Handle or log the exception
-                    throw new Exception("Error saving changes to the database.", ex);
+                    throw new ApiException("Error saving changes to the database.");
                 }
             }
         }
@@ -127,21 +132,27 @@ namespace Tick.Core.Repository
             using (var scope = _serviceScopeFactory.CreateScope())
             {
                 var dbContext = GetDatabaseContext(scope);
-                var existingTask = await _getDbSet(dbContext).FindAsync(task.Id);
 
-                if (existingTask == null)
+                // Check that task is valid
+                if (task == null)
                 {
-                    throw new KeyNotFoundException($"Task with ID {task.Id} not found");
+                    // Handle the case where task is null
+                    throw new ApiException("Task object cannot be null");
                 }
 
-                existingTask.Details = task.Details;
-                existingTask.IsImportant = task.IsImportant;
+                // Edit valid task to DB
+                try
+                {
+                    _getDbSet(dbContext).Update(task);
+                    await dbContext.SaveChangesAsync();
 
-                dbContext.Update(existingTask);
-                await dbContext.SaveChangesAsync();
-
-                return existingTask;
-
+                    return task;
+                }
+                catch (Exception ex)
+                {
+                    // Handle or log the exception
+                    throw new ApiException("Error saving changes to the database.");
+                }
             }
         }
 
@@ -152,49 +163,56 @@ namespace Tick.Core.Repository
             {
                 var dbContext = GetDatabaseContext(scope);
 
-                // Get existing task
-                var existingTask = await _getDbSet(dbContext).FindAsync(task.Id);
-
-                if (existingTask == null)
+                // Check that task is valid
+                if (task == null)
                 {
-                    throw new KeyNotFoundException($"Task with ID {existingTask.Id} not found");
+                    // Handle the case where task is null
+                    throw new ApiException("Task object cannot be null");
                 }
 
-                // Negate IsCompleted attribute of existing task
-                existingTask.IsCompleted = !existingTask.IsCompleted;
+                // Edit valid task to DB
+                try
+                {
+                    _getDbSet(dbContext).Update(task);
+                    await dbContext.SaveChangesAsync();
 
-
-                // Update existing task
-                dbContext.Update(existingTask);
-                await dbContext.SaveChangesAsync();
-
-
-                // Return the updated task
-                return existingTask;
+                    return task;
+                }
+                catch (Exception ex)
+                {
+                    // Handle or log the exception
+                    throw new ApiException("Error saving changes to the database.");
+                }
             }
         }
 
-        public async Task<string> DeleteTaskAsync(string taskId)
+        public async Task<string> DeleteTaskAsync(Tick.Domain.Entities.Task task)
         {
             using (var scope = _serviceScopeFactory.CreateScope())
             {
 
                 var dbContext = GetDatabaseContext(scope);
 
-                // Get existing task
-                var existingTask = await _getDbSet(dbContext).FindAsync(taskId);
-
-                if (existingTask == null)
+                // Check that task is valid
+                if (task == null)
                 {
-                    throw new KeyNotFoundException($"Task with ID {existingTask.Id} not found");
+                    // Handle the case where task is null
+                    throw new ApiException("Task object cannot be null");
                 }
 
-                // Delete existing Task
-                _getDbSet(dbContext).Remove(existingTask);
-                await dbContext.SaveChangesAsync();
+                // Delete valid task from DB
+                try
+                {
+                    _getDbSet(dbContext).Remove(task);
+                    await dbContext.SaveChangesAsync();
 
-                // Return success
-                return $"Task with ID {existingTask.Id} deleted";
+                    return $"Task with ID {task.Id} deleted";
+                }
+                catch (Exception ex)
+                {
+                    // Handle or log the exception
+                    throw new ApiException("Error saving changes to the database.");
+                }
             }
         }
     }

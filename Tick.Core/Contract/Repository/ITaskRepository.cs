@@ -15,6 +15,6 @@ namespace Tick.Core.Contract.Repository
         Task<Tick.Domain.Entities.Task> AddTaskAsync(Tick.Domain.Entities.Task Task);
         Task<Tick.Domain.Entities.Task> EditTaskAsync(Tick.Domain.Entities.Task Task);
         Task<Tick.Domain.Entities.Task> ToggleCompleteTaskAsync(Tick.Domain.Entities.Task Task);
-        Task<string> DeleteTaskAsync(string taskId);
+        Task<string> DeleteTaskAsync(Tick.Domain.Entities.Task Task);
     }
 }

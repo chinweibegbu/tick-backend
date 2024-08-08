@@ -27,10 +27,10 @@ namespace Tick.Controllers
             return Ok(await _taskService.GetTasksAsync(queryParameters, HttpContext.RequestAborted));
         }
 
-        [HttpGet("getTasksByUserId/{userId}")]
-        public async Task<ActionResult<Response<TaskResponse>>> GetTasksByUserId(string userId)
+        [HttpGet("getTasksByUserId")]
+        public async Task<ActionResult<Response<TaskResponse>>> GetTasksByUserId()
         {
-            return Ok(await _taskService.GetTasksByUserIdAsync(userId, HttpContext.RequestAborted));
+            return Ok(await _taskService.GetTasksByUserIdAsync(HttpContext.RequestAborted));
         }
 
         [HttpGet("getTaskById/{taskId}")]
