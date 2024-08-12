@@ -33,8 +33,15 @@ namespace Tick.Infrastructure.Extension
             AdminOptions adminOptions = new AdminOptions();
             configuration.Bind("AdminOptions", adminOptions);
 
+            // NOTE: Only allows calls from IP addressed specified in appsettings.json in the AdminOptions.AllowedHosts object
+            //app.UseCors(options =>
+            //     options.WithOrigins(adminOptions.AllowedHosts)
+            //     .AllowAnyHeader()
+            //     .WithExposedHeaders("Content-Disposition")
+            //     .AllowAnyMethod());
+
             app.UseCors(options =>
-                 options.WithOrigins(adminOptions.AllowedHosts)
+                 options.AllowAnyOrigin()
                  .AllowAnyHeader()
                  .WithExposedHeaders("Content-Disposition")
                  .AllowAnyMethod());
