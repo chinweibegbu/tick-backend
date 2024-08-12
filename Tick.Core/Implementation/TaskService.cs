@@ -47,7 +47,7 @@ namespace Tick.Core.Implementation
             return new PagedResponse<List<TaskResponse>>(taskResponses, pagedTasks.PageMeta.PageNumber, pagedTasks.PageMeta.PageSize, pagedTasks.PageMeta.TotalRecords, "Tasks Retrieved Successfully");
         }
 
-        public async Task<List<TaskResponse>> GetTasksByUserIdAsync(CancellationToken cancellationToken)
+        public async Task<Response<List<TaskResponse>>> GetTasksByUserIdAsync(CancellationToken cancellationToken)
         {
             // Get user from HTTPContextAccessor
             string tickerId = _httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(x => x.Type == "userId")?.Value;
@@ -58,7 +58,7 @@ namespace Tick.Core.Implementation
             // Map the list of tasks to a list of TaskResponse objects using the injected IMapper
             var taskResponses = _mapper.Map<List<Tick.Domain.Entities.Task>, List<TaskResponse>>(tasks);
 
-            return taskResponses;
+            return new Response<List<TaskResponse>>(taskResponses, "Fetched tasks by user ID");
         }
 
         public async Task<Response<TaskResponse>> GetTaskById(string taskId, CancellationToken cancellationToken)

@@ -12,7 +12,7 @@ namespace Tick.Core.Contract
     public interface ITaskService
     {
         Task<PagedResponse<List<TaskResponse>>> GetTasksAsync(TaskQueryParameters queryParameters, CancellationToken cancellationToken);
-        Task<List<TaskResponse>> GetTasksByUserIdAsync(CancellationToken cancellationToken);
+        Task<Response<List<TaskResponse>>> GetTasksByUserIdAsync(CancellationToken cancellationToken);
         Task<Response<TaskResponse>> GetTaskById(string taskId, CancellationToken cancellationToken);
         Task<Response<TaskResponse>> AddTaskAsync(AddTaskRequest request, CancellationToken cancellationToken);
         Task<Response<TaskResponse>> EditTaskAsync(EditTaskRequest request, string taskId, CancellationToken cancellationToken);
