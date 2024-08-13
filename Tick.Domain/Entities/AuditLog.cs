@@ -28,7 +28,7 @@ namespace Tick.Domain.Entities
 
         public override void SetNewId()
         {
-            Id = $"AUD_{CoreHelpers.CreateUlid(DateTimeOffset.Now)}";
+            Id = $"{CoreHelpers.CreateUlid(DateTimeOffset.Now)}";
         }
     }
 }
