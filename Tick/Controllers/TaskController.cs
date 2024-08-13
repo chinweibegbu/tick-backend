@@ -52,7 +52,7 @@ namespace Tick.Controllers
         }
 
         [HttpPost("toggleCompleteTask/{taskId}")]
-        public async Task<ActionResult<Response<string>>> ToggleCompleteask([FromBody] EditTaskRequest request, string taskId)
+        public async Task<ActionResult<Response<string>>> ToggleCompleteask(string taskId)
         {
             return Ok(await _taskService.ToggleCompleteTaskAsync(taskId, HttpContext.RequestAborted));
         }

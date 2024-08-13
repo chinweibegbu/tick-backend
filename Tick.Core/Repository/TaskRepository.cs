@@ -73,8 +73,8 @@ namespace Tick.Core.Repository
                 // Apply filter based on the specified userId
                 query = query.Where(x => x.TickerId == tickerId);
 
-                // Apply grouping by whether or not its completed
-                // query = query.GroupBy(x => x.IsCompleted);
+                // Apply ordering by creation time, newest first
+                query = query.OrderByDescending(x => x.CreatedAt);
 
                 var result = await query
                     .Include(c => c.Ticker)
