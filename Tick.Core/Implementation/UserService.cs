@@ -148,7 +148,8 @@ namespace Tick.Core.Implementation
             {
                 new Claim(JwtRegisteredClaimNames.Jti, user.Id.ToString()),
                 new Claim(JwtRegisteredClaimNames.UniqueName, user.UserName),
-                new Claim(JwtRegisteredClaimNames.Iat, utcNow.ToString()),
+                //new Claim(JwtRegisteredClaimNames.Iat, utcNow.ToString()),
+                new Claim(JwtRegisteredClaimNames.Iat, utcNow.Ticks.ToString()),
                 new Claim("userId", user.Id),
                 new Claim("firstName", user.FirstName),
                 new Claim("lastName", user.LastName),
