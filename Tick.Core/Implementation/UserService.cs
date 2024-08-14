@@ -247,12 +247,21 @@ namespace Tick.Core.Implementation
 
         public async Task<Response<string>> AddUserAsync(AddUserRequest request, CancellationToken cancellationToken)
         {
+            // Check that the username is unique
             var userWithSameUserName = await _userManager.FindByNameAsync(request.UserName);
             if (userWithSameUserName != null)
             {
                 throw new ApiException($"Username '{request.UserName}' is already registered.");
             }
 
+            // Check that the email is unique
+            var userWithSameEmail = await _userManager.FindByEmailAsync(request.Email);
+            if (userWithSameEmail != null)
+            {
+                throw new ApiException($"Email '{request.Email}' is already registered.");
+            }
+
+            // Get user role: Admin or Ticker
             var roleName = Enum.GetName(typeof(UserRole), request.Role) ?? throw new ApiException($"Invalid role specified.");
 
             // Check if the role exists
@@ -292,10 +301,12 @@ namespace Tick.Core.Implementation
             string userEmail = newUser.Email;
             string url = $"{_externalApiOptions.PasswordResetUrl}/{HttpUtility.UrlEncode(token)}";
 
+            // NOT WORKING
+            // WHY ? No email service configured
             string jobId = BackgroundJob.Enqueue(() => _notificationService.SendPasswordResetToken(userName, url, firstName, userEmail));
             _logger.LogInformation($"Successfully sent out the Password Reset job with Job ID {jobId}");
 
-            return new Response<string>(newUser.Id, message: $"Successfully registered user with username - {request.UserName}");
+            return new Response<string>(newUser.Id, message: $"Successfully registered user with email - {request.Email}");
         }
 
         public async Task<Response<string>> EditUserAsync(EditUserRequest request, CancellationToken cancellationToken)

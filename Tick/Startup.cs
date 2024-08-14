@@ -38,6 +38,9 @@ namespace Tick
 
             services.AddInMemoryCache();
 
+            // Handle Hangfire bug
+            services.AddCustomHangfire(Configuration, configRoot);
+
             services.AddSwaggerOpenAPI();
 
             services.AddCustomOptions();

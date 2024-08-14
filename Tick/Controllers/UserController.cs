@@ -41,7 +41,7 @@ namespace Tick.Controllers
         {
             return Ok(await _userService.GetUserById(id, HttpContext.RequestAborted));
         }
-        [Authorize(Roles = "Administrator")]
+        [AllowAnonymous]
         [HttpPost("addUser")]
         public async Task<ActionResult<Response<string>>> AddUser(AddUserRequest request)
         {

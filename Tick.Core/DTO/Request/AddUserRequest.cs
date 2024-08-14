@@ -29,6 +29,6 @@ namespace Tick.Core.DTO.Request
 
         [Required]
         [DataType(DataType.Text)]
-        public string ParticipantId { get; set; }
+        public string Password { get; set; }
     }
 }
