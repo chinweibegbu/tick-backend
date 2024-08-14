@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Hosting;
 using System.IO;
 using System.Threading.Tasks;
+using System.Net;
 
 namespace Tick.Core.Storage
 {
@@ -21,7 +22,7 @@ namespace Tick.Core.Storage
 
             if (!File.Exists(filePath))
             {
-                throw new ApiException("No media found.");
+                throw new ApiException("No media found.", httpStatusCode: HttpStatusCode.NotFound);
             }
 
             return await File.ReadAllBytesAsync(filePath); ;

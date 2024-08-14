@@ -18,6 +18,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Org.BouncyCastle.Asn1.Ocsp;
+using System.Net;
 
 namespace Tick.Core.Implementation
 {
@@ -68,14 +69,14 @@ namespace Tick.Core.Implementation
 
             if (string.IsNullOrEmpty(tickerId))
             {
-                throw new ApiException("Please Login.");
+                throw new ApiException("Please Login.", httpStatusCode:HttpStatusCode.Unauthorized);
             }
 
             // Retrieve the existing task by ID
             var existingTask = await _taskRepository.GetTaskByIdAsync(taskId);
             if (existingTask == null)
             {
-                throw new ApiException($"Task with ID {taskId} not found");
+                throw new ApiException($"Task with ID {taskId} not found", httpStatusCode:HttpStatusCode.NotFound);
             }
 
             // Ensure the exsiting task belongs to the current user
@@ -112,14 +113,14 @@ namespace Tick.Core.Implementation
 
             if (string.IsNullOrEmpty(tickerId))
             {
-                throw new ApiException("Please Login.");
+                throw new ApiException("Please Login.", httpStatusCode:HttpStatusCode.Unauthorized);
             }
 
             // Retrieve the existing task by ID
             var existingTask = await _taskRepository.GetTaskByIdAsync(taskId);
             if (existingTask == null)
             {
-                throw new ApiException($"Task with ID {taskId} not found");
+                throw new ApiException($"Task with ID {taskId} not found", httpStatusCode:HttpStatusCode.NotFound);
             }
 
             // Ensure the exsiting task belongs to the current user
@@ -146,14 +147,14 @@ namespace Tick.Core.Implementation
 
             if (string.IsNullOrEmpty(tickerId))
             {
-                throw new ApiException("Please Login.");
+                throw new ApiException("Please Login.", httpStatusCode:HttpStatusCode.Unauthorized);
             }
 
             // Retrieve the existing task by ID
             var existingTask = await _taskRepository.GetTaskByIdAsync(taskId);
             if (existingTask == null)
             {
-                throw new ApiException($"Task with ID {taskId} not found");
+                throw new ApiException($"Task with ID {taskId} not found", httpStatusCode:HttpStatusCode.NotFound);
             }
 
             // Ensure the existing task belongs to the current user
@@ -179,14 +180,14 @@ namespace Tick.Core.Implementation
 
             if (string.IsNullOrEmpty(tickerId))
             {
-                throw new ApiException("Please Login.");
+                throw new ApiException("Please Login.", httpStatusCode:HttpStatusCode.Unauthorized);
             }
 
             // Retrieve the existing task by ID
             var existingTask = await _taskRepository.GetTaskByIdAsync(taskId);
             if (existingTask == null)
             {
-                throw new ApiException($"Task with ID {taskId} not found");
+                throw new ApiException($"Task with ID {taskId} not found", httpStatusCode:HttpStatusCode.NotFound);
             }
 
             // Ensure the task belongs to the current user

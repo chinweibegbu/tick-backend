@@ -18,6 +18,7 @@ using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 using System.Threading;
 using Tick.Core.Exceptions;
 using Microsoft.IdentityModel.Tokens;
+using System.Net;
 
 namespace Tick.Core.Repository
 {
@@ -106,7 +107,7 @@ namespace Tick.Core.Repository
                 if (task == null)
                 {
                     // Handle the case where task is null
-                    throw new ApiException("Task object cannot be null");
+                    throw new ApiException("Task object cannot be null", httpStatusCode:HttpStatusCode.BadRequest);
                 }
 
 
@@ -137,7 +138,7 @@ namespace Tick.Core.Repository
                 if (task == null)
                 {
                     // Handle the case where task is null
-                    throw new ApiException("Task object cannot be null");
+                    throw new ApiException("Task object cannot be null", httpStatusCode: HttpStatusCode.BadRequest);
                 }
 
                 // Edit valid task to DB
@@ -167,7 +168,7 @@ namespace Tick.Core.Repository
                 if (task == null)
                 {
                     // Handle the case where task is null
-                    throw new ApiException("Task object cannot be null");
+                    throw new ApiException("Task object cannot be null", httpStatusCode: HttpStatusCode.BadRequest);
                 }
 
                 // Edit valid task to DB
@@ -197,7 +198,7 @@ namespace Tick.Core.Repository
                 if (task == null)
                 {
                     // Handle the case where task is null
-                    throw new ApiException("Task object cannot be null");
+                    throw new ApiException("Task object cannot be null", httpStatusCode: HttpStatusCode.BadRequest);
                 }
 
                 // Delete valid task from DB

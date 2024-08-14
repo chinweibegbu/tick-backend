@@ -5,6 +5,7 @@ using Azure.Storage.Blobs.Models;
 using Microsoft.Extensions.Options;
 using System.IO;
 using System.Threading.Tasks;
+using System.Net;
 
 namespace Tick.Core.Storage
 {
@@ -36,7 +37,7 @@ namespace Tick.Core.Storage
 
             if (content == null || content.Value?.Content == null)
             {
-                throw new ApiException("No media found.");
+                throw new ApiException("No media found.", httpStatusCode: HttpStatusCode.NotFound);
             }
 
             return content.Value.Content.ToArray();
