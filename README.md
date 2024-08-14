@@ -95,11 +95,8 @@ To get a local copy up and running, follow these simple steps.
    ```sh
    git clone https://github.com/chinweibegbu/tick-backend.git
    ```
-3. Install NuGet packages
-   ```sh
-   npm install
-   ```
-4. Start local environment by clicking on the "IIS Express" debug button
+2. Install NuGet packages
+3. Start local environment by clicking on the "IIS Express" debug button
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
