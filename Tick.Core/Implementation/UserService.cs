@@ -278,13 +278,15 @@ namespace Tick.Core.Implementation
             newUser.UpdatedAt = DateTime.Now;
             newUser.IsActive = true;
 
-            var result = await _userManager.CreateAsync(newUser);
+            // Create user + Include password
+            var result = await _userManager.CreateAsync(newUser, request.Password);
 
             if (!result.Succeeded)
             {
                 throw new ApiException($"{result.Errors.FirstOrDefault().Description}");
             }
-
+            
+            // Add user to role
             IdentityResult roleResult = await _userManager.AddToRoleAsync(newUser, roleName);
 
             if (!roleResult.Succeeded)

@@ -28,7 +28,7 @@ namespace Tick.Core.DTO.Request
         public UserRole Role { get; set; }
 
         [Required]
-        [DataType(DataType.Text)]
+        [DataType(DataType.Password)]
         public string Password { get; set; }
     }
 }
