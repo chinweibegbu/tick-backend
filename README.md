@@ -138,9 +138,9 @@ Alternatively, you can open an [Issue](https://github.com/chinweibegbu/tick-back
   - [ ] profilePhoto
 - [x] `/api/User/editUser`
 - [x] `/api/User/deleteUser`
-- [ ] `/api/User/resetUser`
+- [x] `/api/User/resetUser`
 - [x] `/api/User/resetUserLockout`
-- [ ] `/api/User/passwordReset`
+- [x] `/api/User/passwordReset`
 
 ### Task Management
 - [x] `/api/Task/getTasks`
