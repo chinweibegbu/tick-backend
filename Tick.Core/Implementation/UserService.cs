@@ -28,6 +28,8 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
+using SendGrid;
+using SendGrid.Helpers.Mail;
 
 namespace Tick.Core.Implementation
 {
@@ -37,6 +39,7 @@ namespace Tick.Core.Implementation
         private readonly ILogger<UserService> _logger;
         private readonly IBasicUserRepository _basicUserRepository;
         private readonly JWTSettings _jwtSettings;
+        private readonly SendGridSettings _sendGridSettings;
         private readonly UserManager<Ticker> _userManager;
         private readonly SignInManager<Ticker> _signInManager;
         private readonly RoleManager<IdentityRole> _roleManager;
@@ -49,6 +52,7 @@ namespace Tick.Core.Implementation
             ILogger<UserService> logger,
             IBasicUserRepository basicUserRepository,
             IOptions<JWTSettings> jwtSettings,
+            IOptions<SendGridSettings> sendGridSettings,
             UserManager<Ticker> userManager,
             SignInManager<Ticker> signInManager,
             RoleManager<IdentityRole> roleManager,
@@ -61,6 +65,7 @@ namespace Tick.Core.Implementation
             _logger = logger;
             _basicUserRepository = basicUserRepository;
             _jwtSettings = jwtSettings.Value;
+            _sendGridSettings = sendGridSettings.Value;
             _userManager = userManager;
             _signInManager = signInManager;
             _roleManager = roleManager;
@@ -391,18 +396,20 @@ namespace Tick.Core.Implementation
 
         public async Task<Response<string>> ResetUserAsync(ResetUserRequest request)
         {
-            var user = await _userManager.FindByNameAsync(request.UserName);
+            var user = await _userManager.FindByEmailAsync(request.Email);
             if (user == null)
             {
                 // This is a security measure to prevent a bad actor from knowing the list of users on the platform.
-                return new Response<string>("", "Reset user successful.");
+                return new Response<string>("", "Reset user successful ??");
             }
 
             string userName = user.UserName;
             string userFirstName = user.FirstName;
             string userEmail = user.Email;
             string token = await _userManager.GeneratePasswordResetTokenAsync(user);
+            string encodedToken = HttpUtility.UrlEncode(token);
 
+            /*
             var resetUserRequest = new
             {
                 UserName = userName,
@@ -414,16 +421,28 @@ namespace Tick.Core.Implementation
 
             string jobId = BackgroundJob.Enqueue(() => _notificationService.SendPasswordResetToken(userName, url.ToString(), userFirstName, userEmail));
             _logger.LogInformation($"Successfully sent out the Password Reset job with Job ID {jobId}");
+            */
 
-            return new Response<string>("", "Reset user successful.");
+            // Send email
+            var apiKey = _sendGridSettings.SendGridApiKey;
+            var client = new SendGridClient(apiKey);
+            var from = new EmailAddress("chinwe.ibegbu@gmail.com", "TICK");
+            var to = new EmailAddress(userEmail, userName);
+            var dynamicEmailTemplateId = "d-087e3ae80b1b4f64b96eabe81194270c";
+            var templateData = new DynamicEmailTemplateData(encodedToken, userEmail);
+            
+            var msg = MailHelper.CreateSingleTemplateEmail(from, to, dynamicEmailTemplateId, templateData);
+            var response = await client.SendEmailAsync(msg);
+
+            return new Response<string>("", "Reset user email sending successful.");
         }
 
         public async Task<Response<string>> ResetUserLockoutAsync(ResetUserRequest request)
         {
-            var user = await _userManager.FindByNameAsync(request.UserName);
+            var user = await _userManager.FindByEmailAsync(request.Email);
             if (user == null)
             {
-                throw new ApiException($"Username '{request.UserName}' could not be found.", httpStatusCode: HttpStatusCode.NotFound);
+                throw new ApiException($"Email '{request.Email}' could not be found.", httpStatusCode: HttpStatusCode.NotFound);
             }
 
             var resetResult = await _userManager.SetLockoutEndDateAsync(user, DateTimeOffset.Now);
@@ -435,27 +454,28 @@ namespace Tick.Core.Implementation
                 throw new ApiException($"An error occured while resetting lockout.");
             }
 
-            return new Response<string>(user.Id, message: $"Successfully reset user with username - {request.UserName}");
+            return new Response<string>(user.Id, message: $"Successfully reset user with email - {request.Email}");
         }
 
         public async Task<Response<string>> PasswordReset(PasswordResetRequest request)
         {
-            Ticker user = await _userManager.FindByNameAsync(request.UserName);
+            Ticker user = await _userManager.FindByEmailAsync(request.Email);
             if (user == null)
             {
-                throw new ApiException($"No user found with username '{request.UserName}'.", httpStatusCode: HttpStatusCode.NotFound);
+                throw new ApiException($"No user found with email '{request.Email}'.", httpStatusCode: HttpStatusCode.NotFound);
             }
 
-            string token = HttpUtility.UrlDecode(request.Token);
+            // TODO: Find out why the request token was already decoded
+            // string token = HttpUtility.UrlDecode(request.Token);
 
-            IdentityResult resetResponse = await _userManager.ResetPasswordAsync(user, token, request.Password);
+            IdentityResult resetResponse = await _userManager.ResetPasswordAsync(user, request.Token, request.Password);
 
             if (!resetResponse.Succeeded)
             {
                 throw new ApiException(resetResponse.Errors.FirstOrDefault().Description);
             }
 
-            return new Response<string>(user.Id, message: $"Successfully reset password for user with username - {request.UserName}");
+            return new Response<string>(user.Id, message: $"Successfully reset password for user with email - {request.Email}");
         }
     }
 }

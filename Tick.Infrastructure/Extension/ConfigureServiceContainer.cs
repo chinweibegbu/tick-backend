@@ -153,6 +153,7 @@ namespace Tick.Infrastructure.Extension
             serviceCollection.AddOptions<ExternalApiOptions>().BindConfiguration("ExternalApiOptions");
             serviceCollection.AddOptions<MockOptions>().BindConfiguration("MockOptions");
             serviceCollection.AddOptions<JWTSettings>().BindConfiguration("JWTSettings");
+            serviceCollection.AddOptions<SendGridSettings>().BindConfiguration("SendGridSettings");
             serviceCollection.AddOptions<AdminOptions>().BindConfiguration("AdminOptions");
             serviceCollection.AddOptions<AzureBlobOptions>().BindConfiguration("AzureBlobOptions");
         }
