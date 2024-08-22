@@ -19,5 +19,6 @@ namespace Tick.Core.DTO.Response
         public string JWToken { get; set; }
         public double ExpiresIn { get; set; }
         public DateTime ExpiryDate { get; set; }
+        public string ProfileImageUrl { get; set; }
     }
 }

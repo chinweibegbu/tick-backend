@@ -30,6 +30,8 @@ using System.Threading.Tasks;
 using System.Web;
 using SendGrid;
 using SendGrid.Helpers.Mail;
+using CloudinaryDotNet;
+using CloudinaryDotNet.Actions;
 
 namespace Tick.Core.Implementation
 {
@@ -40,6 +42,7 @@ namespace Tick.Core.Implementation
         private readonly IBasicUserRepository _basicUserRepository;
         private readonly JWTSettings _jwtSettings;
         private readonly SendGridSettings _sendGridSettings;
+        private readonly CloudinarySettings _cloudinarySettings;
         private readonly UserManager<Ticker> _userManager;
         private readonly SignInManager<Ticker> _signInManager;
         private readonly RoleManager<IdentityRole> _roleManager;
@@ -53,6 +56,7 @@ namespace Tick.Core.Implementation
             IBasicUserRepository basicUserRepository,
             IOptions<JWTSettings> jwtSettings,
             IOptions<SendGridSettings> sendGridSettings,
+            IOptions<CloudinarySettings> cloudinarySettings,
             UserManager<Ticker> userManager,
             SignInManager<Ticker> signInManager,
             RoleManager<IdentityRole> roleManager,
@@ -66,6 +70,7 @@ namespace Tick.Core.Implementation
             _basicUserRepository = basicUserRepository;
             _jwtSettings = jwtSettings.Value;
             _sendGridSettings = sendGridSettings.Value;
+            _cloudinarySettings = cloudinarySettings.Value;
             _userManager = userManager;
             _signInManager = signInManager;
             _roleManager = roleManager;
@@ -283,6 +288,32 @@ namespace Tick.Core.Implementation
             newUser.UpdatedAt = DateTime.Now;
             newUser.IsActive = true;
 
+            // Configure Cloudinary
+            Account account = new Account(_cloudinarySettings.CloudName, _cloudinarySettings.ApiKey, _cloudinarySettings.ApiSecret);
+            Cloudinary cloudinary = new Cloudinary(account);
+            cloudinary.Api.Secure = true;
+
+            // Upload image to Cloudinary IF it exists
+            if (request.ProfileImage != null)
+            {
+                var uploadParams = new ImageUploadParams()
+                {
+                    File = new FileDescription(name: request.ProfileImage.FileName, stream: request.ProfileImage.OpenReadStream()),
+                    UseFilename = true,
+                    UniqueFilename = false,
+                    Overwrite = true
+                };
+
+                var uploadResult = cloudinary.Upload(uploadParams);
+
+                // Add user's profile image Cloudinary URL to user
+                newUser.ProfileImageUrl = uploadResult.Url.ToString();
+            } 
+            else {
+                // Add default profile image Cloudinary URL to user
+                newUser.ProfileImageUrl = _cloudinarySettings.DefaultImageUrl;
+            }
+            
             // Create user + Include password
             var result = await _userManager.CreateAsync(newUser, request.Password);
 

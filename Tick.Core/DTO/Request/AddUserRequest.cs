@@ -1,5 +1,6 @@
 ﻿using Tick.Domain.Enum;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Http;
 
 namespace Tick.Core.DTO.Request
 {
@@ -30,5 +31,8 @@ namespace Tick.Core.DTO.Request
         [Required]
         [DataType(DataType.Password)]
         public string Password { get; set; }
+        
+        public IFormFile? ProfileImage { get; set; }
+
     }
 }

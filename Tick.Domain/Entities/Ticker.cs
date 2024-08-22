@@ -16,6 +16,7 @@ namespace Tick.Domain.Entities
         public DateTime LastLoginTime { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
+        public string ProfileImageUrl { get; set; }
         public ICollection<Entities.Task> Tasks { get; set; }
     }
 }

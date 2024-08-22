@@ -16,5 +16,6 @@ namespace Tick.Core.DTO.Response
         public UserRole DefaultRole { get; set; }
         public string DefaultRoleMeaning => Enum.GetName(typeof(UserRole), DefaultRole);
         public List<string> Roles { get; set; }
+        public string ProfileImageUrl { get; set; }
     }
 }
