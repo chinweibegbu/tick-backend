@@ -89,12 +89,12 @@ namespace Tick.Core.Implementation
 
             if (user == null)
             {
-                throw new ApiException($"No Accounts Registered with {request.Email}.", httpStatusCode:HttpStatusCode.BadRequest);
+                throw new ApiException($"No account found with email - {request.Email}", httpStatusCode:HttpStatusCode.BadRequest);
             }
 
             if (!user.IsActive)
             {
-                throw new ApiException($"Inactive account.", httpStatusCode:HttpStatusCode.BadRequest);
+                throw new ApiException($"Inactive account", httpStatusCode:HttpStatusCode.BadRequest);
             }
 
             // Verify the username and password
@@ -105,7 +105,7 @@ namespace Tick.Core.Implementation
                 {
                     throw new ApiException($"This user has been locked. Kindly contact the administrator.", httpStatusCode:HttpStatusCode.BadRequest);
                 }
-                throw new ApiException($"Invalid Credentials for '{request.Email}'.", httpStatusCode:HttpStatusCode.BadRequest);
+                throw new ApiException($"Incorrect password for email - {request.Email}", httpStatusCode:HttpStatusCode.BadRequest);
             }
             JwtSecurityToken jwtSecurityToken = await GenerateJWToken(user, cancellationToken);
 
@@ -119,7 +119,7 @@ namespace Tick.Core.Implementation
             user.LastLoginTime = DateTime.Now;
             await _userManager.UpdateAsync(user);
 
-            return new Response<AuthenticationResponse>(response, $"Authenticated {user.Email}");
+            return new Response<AuthenticationResponse>(response, $"Authenticated email - {user.Email}");
         }
 
         public async Task<BasicAuthResponse> BasicAuthenticateAsync(string apiKey, CancellationToken cancellationToken)
@@ -129,7 +129,7 @@ namespace Tick.Core.Implementation
 
             if (basicUser == null)
             {
-                throw new Exception($"Invalid API Key.");
+                throw new Exception($"Invalid API Key");
             }
 
             var response = _mapper.Map<BasicUser, BasicAuthResponse>(basicUser);
@@ -247,12 +247,12 @@ namespace Tick.Core.Implementation
 
             if (userData == null)
             {
-                throw new ApiException($"No user found for User ID - {id}.", httpStatusCode:HttpStatusCode.NotFound);
+                throw new ApiException($"No user found with ID - {id}", httpStatusCode:HttpStatusCode.NotFound);
             }
 
             UserResponse response = _mapper.Map<Ticker, UserResponse>(userData);
 
-            return new Response<UserResponse>(response, $"Successfully retrieved user details for user with Id - {id}");
+            return new Response<UserResponse>(response, $"Successfully retrieved user details for user with ID - {id}");
         }
 
         public async Task<Response<string>> AddUserAsync(AddUserRequest request, CancellationToken cancellationToken)
@@ -261,23 +261,23 @@ namespace Tick.Core.Implementation
             var userWithSameUserName = await _userManager.FindByNameAsync(request.UserName);
             if (userWithSameUserName != null)
             {
-                throw new ApiException($"Username '{request.UserName}' is already registered.", httpStatusCode:HttpStatusCode.Conflict);
+                throw new ApiException($"Username {request.UserName} is already registered", httpStatusCode:HttpStatusCode.Conflict);
             }
 
             // Check that the email is unique
             var userWithSameEmail = await _userManager.FindByEmailAsync(request.Email);
             if (userWithSameEmail != null)
             {
-                throw new ApiException($"Email '{request.Email}' is already registered.", httpStatusCode: HttpStatusCode.Conflict);
+                throw new ApiException($"Email {request.Email} is already registered", httpStatusCode: HttpStatusCode.Conflict);
             }
 
             // Get user role: Admin or Ticker
-            var roleName = Enum.GetName(typeof(UserRole), request.Role) ?? throw new ApiException($"Invalid role specified.", httpStatusCode: HttpStatusCode.NotFound);
+            var roleName = Enum.GetName(typeof(UserRole), request.Role) ?? throw new ApiException($"Invalid role specified", httpStatusCode: HttpStatusCode.NotFound);
 
             // Check if the role exists
             if (!await _roleManager.RoleExistsAsync(roleName))
             {
-                throw new ApiException($"Invalid role specified.", httpStatusCode: HttpStatusCode.NotFound);
+                throw new ApiException($"Invalid role specified", httpStatusCode: HttpStatusCode.NotFound);
             }
 
             string username = _httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(x => x.Type == "username")?.Value;
@@ -352,15 +352,15 @@ namespace Tick.Core.Implementation
             Ticker user = await _userManager.FindByNameAsync(request.UserName);
             if (user == null)
             {
-                throw new ApiException($"Username '{request.UserName}' could not be found.", httpStatusCode: HttpStatusCode.NotFound);
+                throw new ApiException($"Username {request.UserName} could not be found", httpStatusCode: HttpStatusCode.NotFound);
             }
 
-            var roleName = Enum.GetName(typeof(UserRole), request.Role) ?? throw new ApiException($"Invalid role specified.", httpStatusCode: HttpStatusCode.NotFound);
+            var roleName = Enum.GetName(typeof(UserRole), request.Role) ?? throw new ApiException($"Invalid role specified", httpStatusCode: HttpStatusCode.NotFound);
 
             // Check if the new role exists
             if (!await _roleManager.RoleExistsAsync(roleName))
             {
-                throw new ApiException($"This role doesn't exists. Please check your roles and try again", httpStatusCode: HttpStatusCode.NotFound);
+                throw new ApiException($"This role doesn't exists. Please check your roles and try again.", httpStatusCode: HttpStatusCode.NotFound);
             }
 
             string username = _httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(x => x.Type == "username")?.Value;
@@ -376,7 +376,7 @@ namespace Tick.Core.Implementation
 
             if (!updateResult.Succeeded)
             {
-                throw new ApiException(updateResult.Errors.FirstOrDefault()?.Description ?? "An error occured while updating users.");
+                throw new ApiException(updateResult.Errors.FirstOrDefault()?.Description ?? "An error occured while updating user");
             }
 
             IList<string> existingRoles = await _userManager.GetRolesAsync(user);
@@ -402,12 +402,12 @@ namespace Tick.Core.Implementation
                 }
             }
 
-            return new Response<string>(user.Id, message: $"Successfully edited user.");
+            return new Response<string>(user.Id, message: $"Successfully edited user with username - {request.UserName}");
         }
 
         public async Task<Response<string>> DeleteUserAsync(DeleteUserRequest request, CancellationToken cancellationToken)
         {
-            Ticker user = await _userManager.FindByNameAsync(request.UserName) ?? throw new ApiException($"The user does not exist.", httpStatusCode: HttpStatusCode.NotFound);
+            Ticker user = await _userManager.FindByNameAsync(request.UserName) ?? throw new ApiException($"No user found with username - {request.UserName}", httpStatusCode: HttpStatusCode.NotFound);
 
             // Work on the request logging
             string username = _httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(x => x.Type == "username")?.Value;
@@ -422,7 +422,7 @@ namespace Tick.Core.Implementation
                 throw new ApiException(result.Errors.FirstOrDefault().Description);
             }
 
-            return new Response<string>(user.Id, message: $"Successfully deleted the user.");
+            return new Response<string>(user.Id, message: $"Successfully deleted the with username - {request.UserName}");
         }
 
         public async Task<Response<string>> ResetUserAsync(ResetUserRequest request)
@@ -465,7 +465,7 @@ namespace Tick.Core.Implementation
             var msg = MailHelper.CreateSingleTemplateEmail(from, to, dynamicEmailTemplateId, templateData);
             var response = await client.SendEmailAsync(msg);
 
-            return new Response<string>("", "Reset user email sending successful.");
+            return new Response<string>("", $"Email successfully sent to user with email - {request.Email}");
         }
 
         public async Task<Response<string>> ResetUserLockoutAsync(ResetUserRequest request)
@@ -473,7 +473,7 @@ namespace Tick.Core.Implementation
             var user = await _userManager.FindByEmailAsync(request.Email);
             if (user == null)
             {
-                throw new ApiException($"Email '{request.Email}' could not be found.", httpStatusCode: HttpStatusCode.NotFound);
+                throw new ApiException($"No user could be found with email - {request.Email}", httpStatusCode: HttpStatusCode.NotFound);
             }
 
             var resetResult = await _userManager.SetLockoutEndDateAsync(user, DateTimeOffset.Now);
@@ -482,7 +482,7 @@ namespace Tick.Core.Implementation
             {
                 _logger.LogError("An error occured while resetting lockout");
                 _logger.LogError(CoreHelpers.ClassToJsonData(resetResult.Errors));
-                throw new ApiException($"An error occured while resetting lockout.");
+                throw new ApiException($"An error occured while resetting lockout");
             }
 
             return new Response<string>(user.Id, message: $"Successfully reset user with email - {request.Email}");
@@ -493,7 +493,7 @@ namespace Tick.Core.Implementation
             Ticker user = await _userManager.FindByEmailAsync(request.Email);
             if (user == null)
             {
-                throw new ApiException($"No user found with email '{request.Email}'.", httpStatusCode: HttpStatusCode.NotFound);
+                throw new ApiException($"No user found with email - {request.Email}", httpStatusCode: HttpStatusCode.NotFound);
             }
 
             // TODO: Find out why the request token was already decoded

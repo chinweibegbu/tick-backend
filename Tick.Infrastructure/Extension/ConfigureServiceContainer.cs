@@ -50,6 +50,7 @@ namespace Tick.Infrastructure.Extension
                 , b =>
                 {
                     b.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName);
+                    b.EnableRetryOnFailure();
                 });
                 //options.AddInterceptors(serviceCollection.BuildServiceProvider().GetRequiredService<DBLongQueryLogger>());
             });
@@ -263,7 +264,7 @@ namespace Tick.Infrastructure.Extension
                     IEnumerable<string> errorList = actionContext.ModelState.Values.SelectMany(x => x.Errors).Select(x => x.ErrorMessage);
                     logger.LogError("Bad Request");
                     logger.LogError(string.Join(",", errorList));
-                    return new BadRequestObjectResult(new Domain.Common.Response<IEnumerable<string>>("Tick Validation Error", 400, errorList));
+                    return new BadRequestObjectResult(new Domain.Common.Response<IEnumerable<string>>("Tick is temporarily unavailable", 400, errorList));
                 });
         }
 
