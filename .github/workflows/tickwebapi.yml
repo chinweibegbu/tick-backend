@@ -1,8 +1,8 @@
 name: Build and deploy .NET Core application to Web App tickwebapi
 on:
   push:
-    # branches:
-    # - main
+    branches:
+      - main
 env:
   AZURE_WEBAPP_NAME: tickwebapi
   AZURE_WEBAPP_PACKAGE_PATH: Tick\published
