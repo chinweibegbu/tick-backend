@@ -12,6 +12,7 @@ using Tick.Persistence;
 using AspNetCoreRateLimit;
 using Hangfire;
 using Hangfire.SqlServer;
+using Hangfire.PostgreSql;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -45,7 +46,7 @@ namespace Tick.Infrastructure.Extension
         {
             serviceCollection.AddDbContext<ApplicationDbContext>(options =>
             {
-                options.UseSqlServer(configuration
+                options.UseNpgsql(configuration
                     .GetConnectionString("DBConnectionString") ?? configRoot["ConnectionStrings:DBConnectionString"]
                 , b =>
                 {
@@ -225,15 +226,12 @@ namespace Tick.Infrastructure.Extension
                 .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
                 .UseSimpleAssemblyNameTypeSerializer()
                 .UseRecommendedSerializerSettings()
-                .UseSqlServerStorage(config.GetConnectionString("DBConnectionString") ?? configRoot["ConnectionStrings:DBConnectionString"], new SqlServerStorageOptions
-                {
-                    CommandBatchMaxTimeout = TimeSpan.FromMinutes(5),
-                    SlidingInvisibilityTimeout = TimeSpan.FromMinutes(5),
-                    QueuePollInterval = TimeSpan.FromSeconds(5),
-                    SchemaName = "PORTAL_HANGFIRE",
-                    UseRecommendedIsolationLevel = true,
-                    DisableGlobalLocks = true,
-                }));
+                .UsePostgreSqlStorage(c =>
+                    c.UseNpgsqlConnection(config.GetConnectionString("DBConnectionString")), new PostgreSqlStorageOptions
+                    {
+                        QueuePollInterval = TimeSpan.FromSeconds(5),
+                        SchemaName = "PORTAL_HANGFIRE",
+                    }));
 
             serviceCollection.AddHangfireServer(options =>
             {

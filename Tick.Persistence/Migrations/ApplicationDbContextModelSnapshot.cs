@@ -2,8 +2,8 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Tick.Persistence;
 
 #nullable disable
@@ -18,39 +18,38 @@ namespace Tick.Persistence.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasDefaultSchema("API_TEMPLATE")
-                .HasAnnotation("ProductVersion", "8.0.8")
+                .HasAnnotation("ProductVersion", "8.0.11")
                 .HasAnnotation("Relational:MaxIdentifierLength", 30);
 
-            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("nvarchar(450)")
+                        .HasColumnType("text")
                         .HasColumnName("ID");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("text")
                         .HasColumnName("CONCURRENCY_STAMP");
 
                     b.Property<string>("Name")
                         .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)")
+                        .HasColumnType("character varying(256)")
                         .HasColumnName("NAME");
 
                     b.Property<string>("NormalizedName")
                         .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)")
+                        .HasColumnType("character varying(256)")
                         .HasColumnName("NORMALIZED_NAME");
 
                     b.HasKey("Id");
 
                     b.HasIndex("NormalizedName")
                         .IsUnique()
-                        .HasDatabaseName("RoleNameIndex")
-                        .HasFilter("[NORMALIZED_NAME] IS NOT NULL");
+                        .HasDatabaseName("RoleNameIndex");
 
                     b.ToTable("ROLE", "API_TEMPLATE");
 
@@ -75,22 +74,22 @@ namespace Tick.Persistence.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
+                        .HasColumnType("integer")
                         .HasColumnName("ID");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("ClaimType")
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("text")
                         .HasColumnName("CLAIM_TYPE");
 
                     b.Property<string>("ClaimValue")
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("text")
                         .HasColumnName("CLAIM_VALUE");
 
                     b.Property<string>("RoleId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)")
+                        .HasColumnType("text")
                         .HasColumnName("ROLE_ID");
 
                     b.HasKey("Id");
@@ -104,22 +103,22 @@ namespace Tick.Persistence.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
+                        .HasColumnType("integer")
                         .HasColumnName("ID");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("ClaimType")
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("text")
                         .HasColumnName("CLAIM_TYPE");
 
                     b.Property<string>("ClaimValue")
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("text")
                         .HasColumnName("CLAIM_VALUE");
 
                     b.Property<string>("UserId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)")
+                        .HasColumnType("text")
                         .HasColumnName("USER_ID");
 
                     b.HasKey("Id");
@@ -132,20 +131,20 @@ namespace Tick.Persistence.Migrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
                     b.Property<string>("LoginProvider")
-                        .HasColumnType("nvarchar(450)")
+                        .HasColumnType("text")
                         .HasColumnName("LOGIN_PROVIDER");
 
                     b.Property<string>("ProviderKey")
-                        .HasColumnType("nvarchar(450)")
+                        .HasColumnType("text")
                         .HasColumnName("PROVIDER_KEY");
 
                     b.Property<string>("ProviderDisplayName")
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("text")
                         .HasColumnName("PROVIDER_DISPLAY_NAME");
 
                     b.Property<string>("UserId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)")
+                        .HasColumnType("text")
                         .HasColumnName("USER_ID");
 
                     b.HasKey("LoginProvider", "ProviderKey");
@@ -158,11 +157,11 @@ namespace Tick.Persistence.Migrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
                 {
                     b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)")
+                        .HasColumnType("text")
                         .HasColumnName("USER_ID");
 
                     b.Property<string>("RoleId")
-                        .HasColumnType("nvarchar(450)")
+                        .HasColumnType("text")
                         .HasColumnName("ROLE_ID");
 
                     b.HasKey("UserId", "RoleId");
@@ -187,19 +186,19 @@ namespace Tick.Persistence.Migrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
                     b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)")
+                        .HasColumnType("text")
                         .HasColumnName("USER_ID");
 
                     b.Property<string>("LoginProvider")
-                        .HasColumnType("nvarchar(450)")
+                        .HasColumnType("text")
                         .HasColumnName("LOGIN_PROVIDER");
 
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(450)")
+                        .HasColumnType("text")
                         .HasColumnName("NAME");
 
                     b.Property<string>("Value")
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("text")
                         .HasColumnName("VALUE");
 
                     b.HasKey("UserId", "LoginProvider", "Name");
@@ -210,37 +209,37 @@ namespace Tick.Persistence.Migrations
             modelBuilder.Entity("Tick.Domain.Entities.BasicUser", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)")
+                        .HasColumnType("text")
                         .HasColumnName("ID");
 
                     b.Property<string>("ApiKey")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)")
+                        .HasColumnType("text")
                         .HasColumnName("API_KEY");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2")
+                        .HasColumnType("timestamp with time zone")
                         .HasColumnName("CREATED_AT");
 
                     b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("text")
                         .HasColumnName("CREATED_BY");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("text")
                         .HasColumnName("NAME");
 
                     b.Property<int>("Status")
-                        .HasColumnType("int")
+                        .HasColumnType("integer")
                         .HasColumnName("STATUS");
 
                     b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2")
+                        .HasColumnType("timestamp with time zone")
                         .HasColumnName("UPDATED_AT");
 
                     b.Property<string>("UpdatedBy")
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("text")
                         .HasColumnName("UPDATED_BY");
 
                     b.HasKey("Id");
@@ -255,22 +254,22 @@ namespace Tick.Persistence.Migrations
                         {
                             Id = "BSR_482242804225Y91361313",
                             ApiKey = "SEC_EPDGYJMVUXEGELEZWHBZGDPZHNIKIZWXUTMJHBNMWWMPBYMFOY",
-                            CreatedAt = new DateTime(2023, 10, 20, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            CreatedAt = new DateTime(2023, 10, 19, 23, 0, 0, 0, DateTimeKind.Utc),
                             CreatedBy = "System",
                             Name = "Access Bank Key 1",
                             Status = 1,
-                            UpdatedAt = new DateTime(2023, 10, 20, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            UpdatedAt = new DateTime(2023, 10, 19, 23, 0, 0, 0, DateTimeKind.Utc),
                             UpdatedBy = "System"
                         },
                         new
                         {
                             Id = "BSR_482242804225Y91908738",
                             ApiKey = "SEC_EPDGYJMVUXEGELEZWHBZGDPZHNIKIZWXUTMJHBNMWWKDHWIWW",
-                            CreatedAt = new DateTime(2023, 10, 20, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            CreatedAt = new DateTime(2023, 10, 19, 23, 0, 0, 0, DateTimeKind.Utc),
                             CreatedBy = "System",
                             Name = "AFF Key 1",
                             Status = 1,
-                            UpdatedAt = new DateTime(2023, 10, 20, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            UpdatedAt = new DateTime(2023, 10, 19, 23, 0, 0, 0, DateTimeKind.Utc),
                             UpdatedBy = "System"
                         });
                 });
@@ -278,27 +277,27 @@ namespace Tick.Persistence.Migrations
             modelBuilder.Entity("Tick.Domain.Entities.Task", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)")
+                        .HasColumnType("text")
                         .HasColumnName("ID");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2")
+                        .HasColumnType("timestamp with time zone")
                         .HasColumnName("CREATED_AT");
 
                     b.Property<string>("Details")
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("text")
                         .HasColumnName("DETAILS");
 
                     b.Property<bool>("IsCompleted")
-                        .HasColumnType("bit")
+                        .HasColumnType("boolean")
                         .HasColumnName("IS_COMPLETED");
 
                     b.Property<bool>("IsImportant")
-                        .HasColumnType("bit")
+                        .HasColumnType("boolean")
                         .HasColumnName("IS_IMPORTANT");
 
                     b.Property<string>("TickerId")
-                        .HasColumnType("nvarchar(450)")
+                        .HasColumnType("text")
                         .HasColumnName("TICKER_ID");
 
                     b.HasKey("Id");
@@ -312,102 +311,102 @@ namespace Tick.Persistence.Migrations
                 {
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("nvarchar(450)")
+                        .HasColumnType("text")
                         .HasColumnName("ID");
 
                     b.Property<int>("AccessFailedCount")
-                        .HasColumnType("int")
+                        .HasColumnType("integer")
                         .HasColumnName("ACCESS_FAILED_COUNT");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("text")
                         .HasColumnName("CONCURRENCY_STAMP");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2")
+                        .HasColumnType("timestamp with time zone")
                         .HasColumnName("CREATED_AT");
 
                     b.Property<int?>("DefaultRole")
-                        .HasColumnType("int")
+                        .HasColumnType("integer")
                         .HasColumnName("DEFAULT_ROLE");
 
                     b.Property<string>("Email")
                         .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)")
+                        .HasColumnType("character varying(256)")
                         .HasColumnName("EMAIL");
 
                     b.Property<bool>("EmailConfirmed")
-                        .HasColumnType("bit")
+                        .HasColumnType("boolean")
                         .HasColumnName("EMAIL_CONFIRMED");
 
                     b.Property<string>("FirstName")
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("text")
                         .HasColumnName("FIRST_NAME");
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("bit")
+                        .HasColumnType("boolean")
                         .HasColumnName("IS_ACTIVE");
 
                     b.Property<bool>("IsLoggedIn")
-                        .HasColumnType("bit")
+                        .HasColumnType("boolean")
                         .HasColumnName("IS_LOGGED_IN");
 
                     b.Property<DateTime>("LastLoginTime")
-                        .HasColumnType("datetime2")
+                        .HasColumnType("timestamp with time zone")
                         .HasColumnName("LAST_LOGIN_TIME");
 
                     b.Property<string>("LastName")
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("text")
                         .HasColumnName("LAST_NAME");
 
                     b.Property<bool>("LockoutEnabled")
-                        .HasColumnType("bit")
+                        .HasColumnType("boolean")
                         .HasColumnName("LOCKOUT_ENABLED");
 
                     b.Property<DateTimeOffset?>("LockoutEnd")
-                        .HasColumnType("datetimeoffset")
+                        .HasColumnType("timestamp with time zone")
                         .HasColumnName("LOCKOUT_END");
 
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)")
+                        .HasColumnType("character varying(256)")
                         .HasColumnName("NORMALIZED_EMAIL");
 
                     b.Property<string>("NormalizedUserName")
                         .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)")
+                        .HasColumnType("character varying(256)")
                         .HasColumnName("NORMALIZED_USER_NAME");
 
                     b.Property<string>("PasswordHash")
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("text")
                         .HasColumnName("PASSWORD_HASH");
 
                     b.Property<string>("PhoneNumber")
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("text")
                         .HasColumnName("PHONE_NUMBER");
 
                     b.Property<bool>("PhoneNumberConfirmed")
-                        .HasColumnType("bit")
+                        .HasColumnType("boolean")
                         .HasColumnName("PHONE_NUMBER_CONFIRMED");
 
                     b.Property<string>("ProfileImageUrl")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<string>("SecurityStamp")
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("text")
                         .HasColumnName("SECURITY_STAMP");
 
                     b.Property<bool>("TwoFactorEnabled")
-                        .HasColumnType("bit")
+                        .HasColumnType("boolean")
                         .HasColumnName("TWO_FACTOR_ENABLED");
 
                     b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("UserName")
                         .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)")
+                        .HasColumnType("character varying(256)")
                         .HasColumnName("USER_NAME");
 
                     b.HasKey("Id");
@@ -417,8 +416,7 @@ namespace Tick.Persistence.Migrations
 
                     b.HasIndex("NormalizedUserName")
                         .IsUnique()
-                        .HasDatabaseName("UserNameIndex")
-                        .HasFilter("[NORMALIZED_USER_NAME] IS NOT NULL");
+                        .HasDatabaseName("UserNameIndex");
 
                     b.ToTable("TICKER", "API_TEMPLATE");
 
@@ -428,14 +426,14 @@ namespace Tick.Persistence.Migrations
                             Id = "7cc5cd62-6240-44e5-b44f-bff0ae73342",
                             AccessFailedCount = 0,
                             ConcurrencyStamp = "71f781f7-e957-469b-96df-9f2035147e45",
-                            CreatedAt = new DateTime(2024, 8, 6, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            CreatedAt = new DateTime(2024, 8, 5, 23, 0, 0, 0, DateTimeKind.Utc),
                             DefaultRole = 1,
                             Email = "chinwe.ibegbu@gmail.com",
                             EmailConfirmed = true,
                             FirstName = "Chinwe",
                             IsActive = true,
                             IsLoggedIn = false,
-                            LastLoginTime = new DateTime(2024, 8, 6, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            LastLoginTime = new DateTime(2024, 8, 5, 23, 0, 0, 0, DateTimeKind.Utc),
                             LastName = "Ibegbu",
                             LockoutEnabled = false,
                             NormalizedEmail = "CHINWE.IBEGBU@GMAIL.COM",
@@ -444,7 +442,7 @@ namespace Tick.Persistence.Migrations
                             PhoneNumberConfirmed = true,
                             SecurityStamp = "71f781f7-e957-469b-96df-9f2035147e93",
                             TwoFactorEnabled = false,
-                            UpdatedAt = new DateTime(2024, 8, 6, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            UpdatedAt = new DateTime(2024, 8, 5, 23, 0, 0, 0, DateTimeKind.Utc),
                             UserName = "ibegbuc"
                         },
                         new
@@ -452,14 +450,14 @@ namespace Tick.Persistence.Migrations
                             Id = "9a6a928b-0e11-4d5d-8a29-b8f04445e72",
                             AccessFailedCount = 0,
                             ConcurrencyStamp = "71f781f7-e957-469b-96df-9f2035147e98",
-                            CreatedAt = new DateTime(2024, 8, 6, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            CreatedAt = new DateTime(2024, 8, 5, 23, 0, 0, 0, DateTimeKind.Utc),
                             DefaultRole = 2,
                             Email = "dabyaibegbu@gmail.com",
                             EmailConfirmed = true,
                             FirstName = "Daby",
                             IsActive = true,
                             IsLoggedIn = false,
-                            LastLoginTime = new DateTime(2024, 8, 6, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            LastLoginTime = new DateTime(2024, 8, 5, 23, 0, 0, 0, DateTimeKind.Utc),
                             LastName = "Ibegbu",
                             LockoutEnabled = false,
                             NormalizedEmail = "DABYAIBEGBU@GMAIL.COM",
@@ -468,7 +466,7 @@ namespace Tick.Persistence.Migrations
                             PhoneNumberConfirmed = true,
                             SecurityStamp = "71f781f7-e957-469b-96df-9f2035147e37",
                             TwoFactorEnabled = false,
-                            UpdatedAt = new DateTime(2024, 8, 6, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            UpdatedAt = new DateTime(2024, 8, 5, 23, 0, 0, 0, DateTimeKind.Utc),
                             UserName = "dabyibegbu"
                         });
                 });

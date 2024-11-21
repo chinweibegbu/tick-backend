@@ -11,7 +11,7 @@ namespace Tick.Domain.Entities.Base
         public string Id { get; set; }
 
         [Column("CREATED_AT")]
-        public DateTime CreatedAt { get; set; } = DateTime.Now;
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public virtual void SetNewId()
         {
             throw new NotImplementedException();

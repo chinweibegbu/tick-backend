@@ -40,7 +40,7 @@ namespace Tick.Persistence
                 .AddJsonFile("appsettings.json")
                 .Build();
 
-            options.UseSqlServer(
+            options.UseNpgsql(
                 configRoot["ConnectionStrings:DBConnectionString"],
                 x => x.MigrationsHistoryTable("MIGRATION_HISTORY", "API_TEMPLATE"));
         }
@@ -304,7 +304,7 @@ namespace Tick.Persistence
 
             foreach (var entity in entities)
             {
-                var now = DateTime.Now; // current datetime
+                var now = DateTime.UtcNow; // current datetime
 
                 ((EntityBase)entity.Entity).CreatedAt = now;
             }
@@ -318,7 +318,7 @@ namespace Tick.Persistence
             foreach (var entity in entities)
             {
                 var userId = _httpContextAccessor.HttpContext?.User.Claims.FirstOrDefault(x => x.Type == "userId")?.Value ?? "internal";
-                var now = DateTime.Now; // current datetime
+                var now = DateTime.UtcNow; // current datetime
 
                 if (entity.State == EntityState.Added)
                 {

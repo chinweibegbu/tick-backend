@@ -97,7 +97,7 @@ namespace Tick.Core.Implementation
             var taskEntity = _mapper.Map<Tick.Domain.Entities.Task>(taskRequest);
             taskEntity.TickerId = tickerId;
             taskEntity.IsCompleted = false;
-            taskEntity.CreatedAt = DateTime.Now;
+            taskEntity.CreatedAt = DateTime.UtcNow;
 
             // Add created task to DB using repository call
             var addedTask = await _taskRepository.AddTaskAsync(taskEntity);
