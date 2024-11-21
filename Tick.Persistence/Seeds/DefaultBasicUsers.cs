@@ -19,8 +19,8 @@ namespace Tick.Persistence.Seeds
                     Status = BasicAuthStatus.Active,
                     CreatedBy = "System",
                     UpdatedBy = "System",
-                    CreatedAt = DateTime.Parse("2023-10-20"),
-                    UpdatedAt = DateTime.Parse("2023-10-20")
+                    CreatedAt = DateTime.Parse("2023-10-20").ToUniversalTime(),
+                    UpdatedAt = DateTime.Parse("2023-10-20").ToUniversalTime()
                 },
                 new BasicUser
                 {
@@ -30,8 +30,8 @@ namespace Tick.Persistence.Seeds
                     Status = BasicAuthStatus.Active,
                     CreatedBy = "System",
                     UpdatedBy = "System",
-                    CreatedAt = DateTime.Parse("2023-10-20"),
-                    UpdatedAt = DateTime.Parse("2023-10-20")
+                    CreatedAt = DateTime.Parse("2023-10-20").ToUniversalTime(),
+                    UpdatedAt = DateTime.Parse("2023-10-20").ToUniversalTime()
                 }
             };
         }

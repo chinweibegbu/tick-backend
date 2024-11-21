@@ -114,9 +114,9 @@ namespace Tick.Core.Implementation
 
             response.JWToken = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
             response.ExpiresIn = _jwtSettings.DurationInMinutes * 60;
-            response.ExpiryDate = DateTime.Now.AddSeconds(_jwtSettings.DurationInMinutes * 60);
+            response.ExpiryDate = DateTime.UtcNow.AddSeconds(_jwtSettings.DurationInMinutes * 60);
 
-            user.LastLoginTime = DateTime.Now;
+            user.LastLoginTime = DateTime.UtcNow;
             await _userManager.UpdateAsync(user);
 
             return new Response<AuthenticationResponse>(response, $"Authenticated email - {user.Email}");
@@ -284,8 +284,8 @@ namespace Tick.Core.Implementation
             string email = _httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(x => x.Type == "emailAddress")?.Value;
 
             Ticker newUser = _mapper.Map<Ticker>(request);
-            newUser.CreatedAt = DateTime.Now;
-            newUser.UpdatedAt = DateTime.Now;
+            newUser.CreatedAt = DateTime.UtcNow;
+            newUser.UpdatedAt = DateTime.UtcNow;
             newUser.IsActive = true;
 
             // Configure Cloudinary
@@ -369,7 +369,7 @@ namespace Tick.Core.Implementation
             user.FirstName = string.IsNullOrEmpty(request.FirstName) ? user.FirstName : request.FirstName;
             user.LastName = string.IsNullOrEmpty(request.LastName) ? user.LastName : request.LastName;
             user.Email = string.IsNullOrEmpty(request.Email) ? user.Email : request.Email;
-            user.UpdatedAt = DateTime.Now;
+            user.UpdatedAt = DateTime.UtcNow;
             user.DefaultRole = request.Role ?? user.DefaultRole;
 
             var updateResult = await _userManager.UpdateAsync(user);

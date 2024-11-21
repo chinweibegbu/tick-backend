@@ -32,9 +32,9 @@ namespace Tick.Persistence.Seeds
                     SecurityStamp = "71f781f7-e957-469b-96df-9f2035147e93",
                     AccessFailedCount = 0,
                     LockoutEnabled = false,
-                    LastLoginTime = DateTime.Parse("2024-08-06"),
-                    CreatedAt = DateTime.Parse("2024-08-06"),
-                    UpdatedAt = DateTime.Parse("2024-08-06")
+                    LastLoginTime = DateTime.Parse("2024-08-06").ToUniversalTime(),
+                    CreatedAt = DateTime.Parse("2024-08-06").ToUniversalTime(),
+                    UpdatedAt = DateTime.Parse("2024-08-06").ToUniversalTime()
                 },
                 new Ticker
                 {
@@ -56,9 +56,9 @@ namespace Tick.Persistence.Seeds
                     SecurityStamp = "71f781f7-e957-469b-96df-9f2035147e37",
                     AccessFailedCount = 0,
                     LockoutEnabled = false,
-                    LastLoginTime = DateTime.Parse("2024-08-06"),
-                    CreatedAt = DateTime.Parse("2024-08-06"),
-                    UpdatedAt = DateTime.Parse("2024-08-06")
+                    LastLoginTime = DateTime.Parse("2024-08-06").ToUniversalTime(),
+                    CreatedAt = DateTime.Parse("2024-08-06").ToUniversalTime(),
+                    UpdatedAt = DateTime.Parse("2024-08-06").ToUniversalTime()
                 }
             };
         }
