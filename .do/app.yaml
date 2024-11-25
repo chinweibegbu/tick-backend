@@ -1,5 +1,0 @@
-name: tick-backend
-services:
-  - name: web
-    dockerfile_path: ./Tick/Dockerfile
-    environment_slug: docker
